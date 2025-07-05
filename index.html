@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qr Code Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: Popins, sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #242356;
+        }
+
+        .container {
+            width: 500px;
+            padding: 35px 45px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 12px;
+
+        }
+
+        .container input {
+            width: 100%;
+            height: 50px;
+            border: 1px solid #231d1d;
+            outline: 0;
+            padding: 10px;
+            margin: 12px 0 25px;
+            border-radius: 8px;
+        }
+
+        .container button {
+            width: 100%;
+            height: 50px;
+            background-color: #3539b3;
+            color: #fff;
+            border: 0;
+            outline: 0;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 10px 12px rgb(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin: 20px 0;
+            font-size: large;
+        }
+
+        #box {
+            width: 200px;
+            border-radius: 8px;
+            max-height: 0;
+            overflow: hidden;
+            margin: 12px auto;
+            transition: max-height 0.3s ease;
+        }
+
+        #box.show-img {
+            max-height: 350px;
+            border: 1px solid #231d1d;
+        }
+
+        .download-btn {
+            width: 100%;
+            height: 50px;
+            background-color: #28a745;
+            color: #fff;
+            border: 0;
+            outline: 0;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 10px 12px rgb(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin: 20px 0;
+            font-size: large;
+            display: none;
+        }
+
+        .download-btn.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <p style="font-size: 16px; font-weight: 650; margin-bottom: 10px;">Enter the text or URL here</p>
+        <input type="text" placeholder=" Enter URL or Text" id="text">
+        <button onclick="generateQR()">Generate QR code</button>
+        <div id="box">
+            <img src="" id="qrImg" style="width: 100%; padding: 12px;">
+        </div>
+        <button class="download-btn" id="downloadBtn" onclick="downloadQR()">Download QR Code</button>
+    </div>
+    <script>
+        let box = document.getElementById("box")
+        let qrImg = document.getElementById("qrImg")
+        let text = document.getElementById("text")
+        let downloadBtn = document.getElementById("downloadBtn")
+
+        // Generate QR code on Enter key
+        text.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                generateQR();
+            }
+        });
+
+        function generateQR() {
+            if (text.value.trim() === '') {
+                alert('Please enter some text or URL');
+                return;
+            }
+
+            qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(text.value);
+            box.classList.add("show-img");
+            downloadBtn.classList.add("show");
+        }
+
+        function downloadQR() {
+            if (!qrImg.src || qrImg.src === window.location.href) {
+                alert('Please generate a QR code first');
+                return;
+            }
+
+            // Create a canvas to draw the image
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 200;
+            canvas.height = 200;
+
+            // Create a new image to avoid CORS issues
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+
+            img.onload = function () {
+                // Draw the image on canvas
+                ctx.drawImage(img, 0, 0, 200, 200);
+
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+
+            img.onerror = function () {
+                // Fallback: direct download from API
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = qrImg.src;
+                link.click();
+            };
+
+            img.src = qrImg.src;
+        }
+    </script>
+</body>
+
+</html>
