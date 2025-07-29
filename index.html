@@ -130,21 +130,20 @@
                 return;
             }
 
-            // Create a canvas to draw the image
+
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 200;
             canvas.height = 200;
 
-            // Create a new image to avoid CORS issues
+
             const img = new Image();
             img.crossOrigin = 'anonymous';
 
             img.onload = function () {
-                // Draw the image on canvas
-                ctx.drawImage(img, 0, 0, 200, 200);
 
-                // Create download link
+                ctx.drawImage(img, 0, 0, 200, 200);
+                
                 const link = document.createElement('a');
                 link.download = 'qrcode.png';
                 link.href = canvas.toDataURL('image/png');
@@ -152,7 +151,7 @@
             };
 
             img.onerror = function () {
-                // Fallback: direct download from API
+
                 const link = document.createElement('a');
                 link.download = 'qrcode.png';
                 link.href = qrImg.src;
